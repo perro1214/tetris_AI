@@ -2,32 +2,58 @@ import random
 from collections import deque
 import time
 
+import csv
+import pprint
+
 # ボードサイズ
 BOARD_WIDTH = 10
 BOARD_HEIGHT = 22
 
 # テトリミノの形状 (数字はブロックの種類を表す)
+# SHAPES = [
+#     [[0, 0, 0, 0],
+#     [1, 1, 1, 1]],  # I
+
+#     [[1, 1],  # O
+#      [2, 2]],
+
+#     [[0, 3, 0],  # T
+#      [3, 3, 3]],
+
+#     [[0, 4, 4],  # S
+#      [4, 4, 0]],
+
+#     [[5, 5, 0],  # Z
+#      [0, 5, 5]],
+
+#     [[6, 0, 0],  # J
+#      [6, 6, 6]],
+
+#     [[0, 0, 7],  # L
+#      [7, 7, 7]]
+# ]
+
 SHAPES = [
     [[0, 0, 0, 0],
     [1, 1, 1, 1]],  # I
 
-    [[2, 2],  # O
-     [2, 2]],
+    [[1, 1],  # O
+     [1, 1]],
 
-    [[0, 3, 0],  # T
-     [3, 3, 3]],
+    [[0, 1, 0],  # T
+     [1, 1, 1]],
 
-    [[0, 4, 4],  # S
-     [4, 4, 0]],
+    [[0, 1, 1],  # S
+     [1, 1, 0]],
 
-    [[5, 5, 0],  # Z
-     [0, 5, 5]],
+    [[1, 1, 0],  # Z
+     [0, 1, 1]],
 
-    [[6, 0, 0],  # J
-     [6, 6, 6]],
+    [[1, 0, 0],  # J
+     [1, 1, 1]],
 
-    [[0, 0, 7],  # L
-     [7, 7, 7]]
+    [[0, 0, 1],  # L
+     [1, 1, 1]]
 ]
 
 # テトリミノの初期位置
@@ -123,7 +149,8 @@ class Tetris:
         for row in range(len(shape)):
             for col in range(len(shape[row])):
                 if shape[row][col]:
-                    self.board[y + row][x + col] = piece['color']
+                    #self.board[y + row][x + col] = piece['color']
+                    self.board[y + row][x + col] = 1
 
     def clear_lines(self):
         # そろったラインを消去し、スコアを更新
@@ -207,44 +234,88 @@ class Tetris:
             for j in i:
                 if j == 0:
                     result+=1
-        #print(result)
-        return result
 
-    def run(self,move):
+        return result
+    
+    def make_input(self):
+        # if(random.randint(0,1) == 0):
+        #     return random.randint(0,3),0,random.randint(0,3)
+        # else:
+        #     return 0,random.randint(0,4),random.randint(0,3)
+        aaa import numpy as np
+        aaa predictions = model.predict(new_data)
+        aaa print(predictions)
+
+
+
+
+    def run(self):
         # メインゲームループ
         while not self.game_over:
         #for i in list(move):
             if(self.game_over):
                 break
-            self.print_board()
+            ##self.print_board()
             Before = self.point()
-
+            old_board = [row[:] for row in self.board]
             # ユーザー入力を処理 (キー入力を待機)
-            user_input = input(" 操作を入力: ").lower()
+            #user_input = input(" 操作を入力: ").lower()
             #user_input = i
+            
+            #user_inputs = move.pop(0)
+            user_inputs = self.make_input()
+            for user_input in list(user_inputs[2]*"w" + user_inputs[0]*"a" + user_inputs[1]*"d" ):
+                if user_input == 'q':
+                    self.game_over = True
+                elif user_input == 'a':
+                    self.move_piece_sideways(-1)
+                elif user_input == 'd':
+                    self.move_piece_sideways(1)
+                elif user_input == 'w':
+                    self.current_piece = self.rotate_piece(self.current_piece)
+                elif user_input == 's':
+                    self.move_piece_down()
+                
+                if self.game_over:
+                    break
+            self.hard_drop()
 
-            if user_input == 'q':
-                self.game_over = True
-            elif user_input == 'a':
-                self.move_piece_sideways(-1)
-            elif user_input == 'd':
-                self.move_piece_sideways(1)
-            elif user_input == 'w':
-                self.current_piece = self.rotate_piece(self.current_piece)
-            elif user_input == 's':
-                self.move_piece_down()
-            elif user_input == ' ':
-                self.hard_drop()
-
+            und = []
+            new_board = [row[:] for row in self.board]
+            for i in range(len(old_board)):
+                for a in range(len(old_board[i])):
+                    if new_board[i][a]!=old_board[i][a]:
+                        und.append([i,a])
+            
+            flat = []
+            for i in old_board:
+                flat += i
+            
+            
             # 一定時間ごとにテトリミノを下に移動
             # if time.time() - self.last_fall_time > self.fall_speed:
             #     self.move_piece_down()
             After = self.point()
-            print(Before - After)
+            # print(flat)
+            # print(Before - After)
+            # print(max([i[0] for i in und]))
+            # print()
+            m = (list(user_inputs)+ list(map(str,flat)) + [str(Before - After)] + [str(max([i[0] for i in und]))] )
+            # print(",".join(m))
+            with open('sample_writer_row.csv', 'a') as f:
+                writer = csv.writer(f)
+                writer.writerow(m)
 
-        print("ゲームオーバー！")
+            # if(not move):
+            #     break
+
+        # print("ゲームオーバー！")
+        ##self.print_board()
 
 # ゲーム開始
 if __name__ == "__main__":
-    game = Tetris([[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)])
-    game.run("                                          ")
+    for i in range(1000):
+        game = Tetris([[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)])
+        game.run()
+        if(i%100 == 0):
+            print(i)
