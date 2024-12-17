@@ -255,9 +255,9 @@ class Tetris:
             flat += i
         req = []
         for k in range(4):
-            for i in range(5):
+            for i in range(4):
                 req += [[self.current_piece["color"]]+[i,0,k]+flat]
-            for j in range(6):
+            for j in range(5):
                 req += [[self.current_piece["color"]]+[0,j,k]+flat]
         ####pprint.pprint(len(z))
         spl = model.predict(req,verbose=0)
@@ -266,7 +266,7 @@ class Tetris:
         #########print(spl)
         for xyz in range(len(spl)):
             x,y,z = spl[xyz]
-            result = x*10+y+z
+            result = x+y*5+z*10
             if ans_number<result:
                 ans_number = result
                 ans_index = xyz
@@ -275,9 +275,9 @@ class Tetris:
 
     # def make_input(self):
     #     if(random.randint(0,1) == 0):
-    #         return random.randint(0,4),0,random.randint(0,4)
+    #         return random.randint(0,3),0,random.randint(0,3)
     #     else:
-    #         return 0,random.randint(0,6),random.randint(0,4)
+    #         return 0,random.randint(0,4),random.randint(0,3)
 
 
 
@@ -287,7 +287,8 @@ class Tetris:
         #for i in list(move):
             if(self.game_over):
                 break
-            ###self.print_board()
+            self.print_board()
+            print(self.board)
             ##print("current",self.current_piece["color"])
             Before = self.point()
             #print("before",Before)
@@ -295,11 +296,11 @@ class Tetris:
             old_lines_cleared = self.lines_cleared
             old_color = self.current_piece["color"]
             # ユーザー入力を処理 (キー入力を待機)
-            #user_input = input(" 操作を入力: ").lower()
+            user_inputs = list(map(int,(input(" 操作を入力: 右に何回 左に何回 何回転::").lower()).split()))
             #user_input = i
             
             #user_inputs = move.pop(0)
-            user_inputs = self.make_input()
+            #user_inputs = self.make_input()
             #print(user_inputs)
             for user_input in list(user_inputs[2]*"w" + user_inputs[0]*"a" + user_inputs[1]*"d" ):
                 if user_input == 'q':
@@ -336,13 +337,19 @@ class Tetris:
             new_lines_cleared = self.lines_cleared
             # print(flat)
             #print(After)
-            #print(Before - After,max([i[0] for i in und]),new_lines_cleared-old_lines_cleared,old_color)
+            print(f"Before{Before}::After{After}::変化{Before - After}",max([i[0] for i in und]),new_lines_cleared-old_lines_cleared,old_color)
             # print()
-            m = ([old_color] + list(user_inputs)+ list(map(str,flat)) + [str(Before - After)] + [str(max([i[0] for i in und]))] + [new_lines_cleared-old_lines_cleared] )
+            m = ( [old_color] + list(user_inputs)+ list(map(str,flat)) + [str(Before - After)] + [str(max([i[0] for i in und]))] + [new_lines_cleared-old_lines_cleared])
             # print(",".join(m))
-            with open('data.csv', 'a') as f:
-                writer = csv.writer(f)
-                writer.writerow(m)
+
+
+
+            # with open('sample_writer_row2.csv', 'a') as f:
+            #     writer = csv.writer(f)
+            #     writer.writerow(m)
+
+
+
 
             # if(not move):
             #     break
@@ -354,12 +361,17 @@ class Tetris:
 if __name__ == "__main__":
     import numpy as np
     import keras
-    argv = input()
-    model = keras.models.load_model(f'model_gen/model_{argv}.h5')
-    #for i in range(1):
-    for i in range(1,1001):
-    #for i in range(1,11):
+    argv = input("スタートするならエンターを押す、または盤面を入力して")
+    if(argv == ""):
         game = Tetris([[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)])
+    else:
+        z = eval(argv)
+        lis = [[] for _ in range(BOARD_HEIGHT)]
+        for i in range(BOARD_HEIGHT):
+            for j in z[i]:
+                lis[i].append(j)
+        game = Tetris(lis)
+    for i in range(1):
         game.run()
         if(i%10 == 0):
             print(i)

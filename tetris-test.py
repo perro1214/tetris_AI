@@ -245,39 +245,39 @@ class Tetris:
 
         return result
     
-    def make_input(self):
-        # if(random.randint(0,1) == 0):
-        #     return random.randint(0,3),0,random.randint(0,3)
-        # else:
-        #     return 0,random.randint(0,4),random.randint(0,3)
-        flat = []
-        for i in self.board:
-            flat += i
-        req = []
-        for k in range(4):
-            for i in range(5):
-                req += [[self.current_piece["color"]]+[i,0,k]+flat]
-            for j in range(6):
-                req += [[self.current_piece["color"]]+[0,j,k]+flat]
-        ####pprint.pprint(len(z))
-        spl = model.predict(req,verbose=0)
-        ans_number = -float("INF")
-        ans_index = -1
-        #########print(spl)
-        for xyz in range(len(spl)):
-            x,y,z = spl[xyz]
-            result = x*10+y+z
-            if ans_number<result:
-                ans_number = result
-                ans_index = xyz
-        ##print(req[ans_index][:3])
-        return req[ans_index][:3]
-
     # def make_input(self):
-    #     if(random.randint(0,1) == 0):
-    #         return random.randint(0,4),0,random.randint(0,4)
-    #     else:
-    #         return 0,random.randint(0,6),random.randint(0,4)
+    #     # if(random.randint(0,1) == 0):
+    #     #     return random.randint(0,3),0,random.randint(0,3)
+    #     # else:
+    #     #     return 0,random.randint(0,4),random.randint(0,3)
+    #     flat = []
+    #     for i in self.board:
+    #         flat += i
+    #     req = []
+    #     for k in range(4):
+    #         for i in range(5):
+    #             req += [[self.current_piece["color"]]+[i,0,k]+flat]
+    #         for j in range(6):
+    #             req += [[self.current_piece["color"]]+[0,j,k]+flat]
+    #     ####pprint.pprint(len(z))
+    #     spl = model.predict(req,verbose=0)
+    #     ans_number = -float("INF")
+    #     ans_index = -1
+    #     #########print(spl)
+    #     for xyz in range(len(spl)):
+    #         x,y,z = spl[xyz]
+    #         result = x+y*5+z*10
+    #         if ans_number<result:
+    #             ans_number = result
+    #             ans_index = xyz
+    #     ##print(req[ans_index][:3])
+    #     return req[ans_index][:3]
+
+    def make_input(self):
+        if(random.randint(0,1) == 0):
+            return random.randint(0,4),0,random.randint(0,4)
+        else:
+            return 0,random.randint(0,6),random.randint(0,4)
 
 
 
@@ -357,7 +357,7 @@ if __name__ == "__main__":
     argv = input()
     model = keras.models.load_model(f'model_gen/model_{argv}.h5')
     #for i in range(1):
-    for i in range(1,1001):
+    for i in range(1,10001):
     #for i in range(1,11):
         game = Tetris([[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)])
         game.run()

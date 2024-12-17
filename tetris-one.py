@@ -255,9 +255,9 @@ class Tetris:
             flat += i
         req = []
         for k in range(4):
-            for i in range(5):
+            for i in range(4):
                 req += [[self.current_piece["color"]]+[i,0,k]+flat]
-            for j in range(6):
+            for j in range(5):
                 req += [[self.current_piece["color"]]+[0,j,k]+flat]
         ####pprint.pprint(len(z))
         spl = model.predict(req,verbose=0)
@@ -266,7 +266,7 @@ class Tetris:
         #########print(spl)
         for xyz in range(len(spl)):
             x,y,z = spl[xyz]
-            result = x*10+y+z
+            result = x*100+y+z*10
             if ans_number<result:
                 ans_number = result
                 ans_index = xyz
@@ -275,9 +275,9 @@ class Tetris:
 
     # def make_input(self):
     #     if(random.randint(0,1) == 0):
-    #         return random.randint(0,4),0,random.randint(0,4)
+    #         return random.randint(0,3),0,random.randint(0,3)
     #     else:
-    #         return 0,random.randint(0,6),random.randint(0,4)
+    #         return 0,random.randint(0,4),random.randint(0,3)
 
 
 
@@ -287,7 +287,7 @@ class Tetris:
         #for i in list(move):
             if(self.game_over):
                 break
-            ###self.print_board()
+            self.print_board()
             ##print("current",self.current_piece["color"])
             Before = self.point()
             #print("before",Before)
@@ -336,13 +336,19 @@ class Tetris:
             new_lines_cleared = self.lines_cleared
             # print(flat)
             #print(After)
-            #print(Before - After,max([i[0] for i in und]),new_lines_cleared-old_lines_cleared,old_color)
+            print(f"Before{Before}::After{After}::変化{Before - After}",max([i[0] for i in und]),new_lines_cleared-old_lines_cleared,old_color)
             # print()
-            m = ([old_color] + list(user_inputs)+ list(map(str,flat)) + [str(Before - After)] + [str(max([i[0] for i in und]))] + [new_lines_cleared-old_lines_cleared] )
+            m = ( [old_color] + list(user_inputs)+ list(map(str,flat)) + [str(Before - After)] + [str(max([i[0] for i in und]))] + [new_lines_cleared-old_lines_cleared])
             # print(",".join(m))
-            with open('data.csv', 'a') as f:
-                writer = csv.writer(f)
-                writer.writerow(m)
+
+
+
+            # with open('sample_writer_row2.csv', 'a') as f:
+            #     writer = csv.writer(f)
+            #     writer.writerow(m)
+
+
+
 
             # if(not move):
             #     break
@@ -355,10 +361,10 @@ if __name__ == "__main__":
     import numpy as np
     import keras
     argv = input()
+    print(f'model_gen/model_{argv}.h5')
     model = keras.models.load_model(f'model_gen/model_{argv}.h5')
-    #for i in range(1):
-    for i in range(1,1001):
-    #for i in range(1,11):
+    for i in range(1):
+    #for i in range(1,10001):
         game = Tetris([[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)])
         game.run()
         if(i%10 == 0):
