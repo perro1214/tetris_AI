@@ -2,6 +2,11 @@
 size1=5000
 size2=100
 
+
+mkdir -p gen
+mkdir -p model_gen
+mkdir -p data_gen
+
 if [ $# -eq 0 ]; then
     echo "引数が指定されていません。デフォルトの5回繰り返し動作を実行します。"
     start=1
