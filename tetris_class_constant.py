@@ -346,3 +346,4 @@ class Tetris:
             with open(f'data_gen/data_{gen}.csv', 'a') as f:
                 writer = csv.writer(f)
                 writer.writerow(m)
+        return self.score

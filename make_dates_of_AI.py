@@ -8,12 +8,15 @@ if __name__ == "__main__":
     argv,size = input().split()
     size = int(size)
     model = keras.models.load_model(f'model_gen/gen_{int(argv)-1}.keras')
+    score = 0
     #for i in range(1):
     for i in range(1,size+1):
         game = Tetris([[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)],model)
-        game.run(False,gen = argv)
+        score += game.run(False,gen = argv)
         if(i%10 == 0):
             print(i)
+    with open(f"score.csv","a") as f:
+        f.write(f'model_gen/gen_{int(argv)-1}.keras'+" , "+str(score/size)+"\n")
 
 
 
