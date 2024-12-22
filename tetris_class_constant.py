@@ -282,7 +282,7 @@ class Tetris:
 
 
 
-    def run(self,flag_first,print_flag=None,gen = 0):
+    def run(self,flag_first,print_flag=None,gen = 0,make_scv_mame = True):
         # メインゲームループ
         while not self.game_over:
         #for i in list(move):
@@ -343,7 +343,9 @@ class Tetris:
             # print()
             m = ([old_color] + list(user_inputs)+ list(map(str,flat)) + [int(Before - After)] + [int(min([i[0] for i in und]))] + [new_lines_cleared-old_lines_cleared] )
             # print(",".join(m))
-            with open(f'data_gen/data_{gen}.csv', 'a') as f:
+            if make_scv_mame:
+                make_scv_mame = gen
+            with open(f'data_gen/data_{make_scv_mame}.csv', 'a') as f:
                 writer = csv.writer(f)
                 writer.writerow(m)
         return self.score
