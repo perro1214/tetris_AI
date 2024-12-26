@@ -282,7 +282,7 @@ class Tetris:
 
 
 
-    def run(self,flag_first,print_flag=None,gen = 0,make_scv_mame = True):
+    def run(self,not_use_AI=False,print_flag=None,gen = 0,make_scv_mame = True):
         # メインゲームループ
         while not self.game_over:
         #for i in list(move):
@@ -301,7 +301,7 @@ class Tetris:
             #user_input = i
             
             #user_inputs = move.pop(0)
-            if flag_first:
+            if not_use_AI == True:
                 user_inputs = self.make_input_random()
             else:
                 user_inputs = self.make_input(print_flag)
@@ -343,9 +343,39 @@ class Tetris:
             # print()
             m = ([old_color] + list(user_inputs)+ list(map(str,flat)) + [int(Before - After)] + [int(min([i[0] for i in und]))] + [new_lines_cleared-old_lines_cleared] )
             # print(",".join(m))
-            if make_scv_mame:
+            if make_scv_mame == True:
                 make_scv_mame = gen
             with open(f'data_gen/data_{make_scv_mame}.csv', 'a') as f:
                 writer = csv.writer(f)
                 writer.writerow(m)
         return self.score
+
+
+
+def get_ai_generation_status(second = False):
+    with open("score.csv","r") as f:
+        generation_count = sum(1 for line in f)
+    if generation_count > 1:
+        generation_count = generation_count//5
+        with open('score.csv', 'r') as file:
+            Y = []
+            for i,line in enumerate(file):
+                if i%5 == 0:
+                    Y.append([int((line.strip().split(',')[0]).replace("model_gen/gen_", "").replace(".keras", "").replace(" ","")),float(line.strip().split(',')[1])])
+                else:
+                    Y[i//5][1] += float(line.strip().split(',')[1])
+        Y = list(map(lambda x: [x[0],x[1]/5], Y))
+        Y = sorted(Y,key=lambda x: (x[1],x[0]), reverse=True)
+        max_score_AI = Y[0][0]#.replace("model_gen/gen_", "").replace(".keras", "").replace(" ","")
+        if generation_count >2:
+            second_score = Y[1][0]
+        else:
+            second_score = 0
+    else:
+        max_score_AI = 0
+        second_score = 0
+
+    if second:
+        return max_score_AI,generation_count,second_score
+    else:
+        return max_score_AI,generation_count

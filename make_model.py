@@ -5,19 +5,40 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from tensorflow import keras
 from tensorflow.keras import layers
+from tetris_class_constant import Tetris,get_ai_generation_status,BOARD_WIDTH, BOARD_HEIGHT
 
 
 # In[2]:
 
 
-print("a")
+print("make")
 
+# def get_ai_generation_status():
+#     with open("score.csv","r") as f:
+#         generation_count = sum(1 for line in f)
+#     if generation_count != 0:
+#         generation_count = generation_count//5
+#         with open('score.csv', 'r') as file:
+#             Y = []
+#             for i,line in enumerate(file):
+#                 if i%5 == 0:
+#                     Y.append([int((line.strip().split(',')[0]).replace("model_gen/gen_", "").replace(".keras", "").replace(" ","")),float(line.strip().split(',')[1])])
+#                 else:
+#                     Y[i//5][1] += float(line.strip().split(',')[1])
+#         Y = list(map(lambda x: [x[0],x[1]/5], Y))
+#         Y = sorted(Y,key=lambda x: (x[1],x[0]), reverse=True)
+#         max_score_AI = Y[0][0]#.replace("model_gen/gen_", "").replace(".keras", "").replace(" ","")
+#     else:
+#         max_score_AI = -1
+#     return max_score_AI,generation_count
 
 # In[55]:
 
-number = int(input())
-with open(f'./data_gen/data_{number}.csv', 'r') as f:
-    lis = f.read().split()
+max_score_AI,generation_count,second_score = get_ai_generation_status(second = True)
+print(max_score_AI,generation_count)
+print(f'./data_gen/data_{max(0,generation_count - 2)}.csv')
+with open(f'./data_gen/data_{max(0,generation_count - 2)}.csv', 'r') as f:
+    lis = f.read().split() 
 for i in range(len(lis)):
     lis[i] = list(map(int,(lis[i].split(","))))
 arr=np.array(lis)
@@ -52,17 +73,21 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 
 # 3. モデルの構築
-model = keras.Sequential(
-    [
-        layers.Dense(256, activation="relu", input_shape=(224,)),  # ここを修正
-        layers.Dense(128, activation="relu"),
-        layers.Dense(64, activation="relu"),
-        layers.Dense(32, activation="relu"),
-        layers.Dense(16, activation="relu"),
-        layers.Dense(8, activation="relu"),
-        layers.Dense(3),
-    ]
-)
+
+if generation_count == 1:
+    model = keras.Sequential(
+        [
+            layers.Dense(256, activation="relu", input_shape=(224,)),
+            #layers.Dense(128, activation="relu"),
+            layers.Dense(64, activation="relu"),
+            #layers.Dense(32, activation="relu"),
+            layers.Dense(16, activation="relu"),
+            #layers.Dense(8, activation="relu"),
+            layers.Dense(3),
+        ]
+    )
+else:
+    model = keras.models.load_model(f'model_gen/gen_{second_score}.keras')
 # 4. モデルのコンパイル
 model.compile(optimizer="adam", loss="mse", metrics=["mae"])
 
@@ -84,10 +109,12 @@ print(f"R2 Score: {r2:.4f}")
 # 7. (オプション) 予測結果の確認
 print("最初の5つの予測結果:")
 for i in range(5):
-    print(f"予測: {y_pred[i]}, 実際: {y_test[i]}")
+    formatted_y_pred = [f"{val:.5f}" for val in y_pred[i]]
+    formatted_y_test = [f"{val:.5f}" for val in y_test[i]]
+    print(f"予測: {formatted_y_pred}, 実際: {formatted_y_test}")
 
 
 # In[60]:
 
 
-model.save(f"model_gen/gen_{number}.keras")
+model.save(f"model_gen/gen_{max(0,generation_count-1)}.keras")
