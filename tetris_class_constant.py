@@ -364,13 +364,17 @@ def get_ai_generation_status(second = False):
                     Y.append([int((line.strip().split(',')[0]).replace("model_gen/gen_", "").replace(".keras", "").replace(" ","")),float(line.strip().split(',')[1])])
                 else:
                     Y[i//5][1] += float(line.strip().split(',')[1])
+        #print(Y)
         Y = list(map(lambda x: [x[0],x[1]/5], Y))
-        Y = sorted(Y,key=lambda x: (x[1],x[0]), reverse=True)
-        max_score_AI = Y[0][0]#.replace("model_gen/gen_", "").replace(".keras", "").replace(" ","")
         if generation_count >2:
-            second_score = Y[1][0]
+            #Y2 = sorted(Y[:-1],key=lambda x: (x[1],x[0]), reverse=True)
+            #second_score = Y[1][0]
+            second_score = Y[-2][0]
         else:
             second_score = 0
+        #Y = sorted(Y,key=lambda x: (x[1],x[0]), reverse=True)
+        #max_score_AI = Y[0][0]#.replace("model_gen/gen_", "").replace(".keras", "").replace(" ","")
+        max_score_AI = Y[-1][0]
     else:
         max_score_AI = 0
         second_score = 0

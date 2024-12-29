@@ -25,9 +25,16 @@ import keras
 #     return max_score_AI,generation_count
 
 if __name__ == "__main__":
+
+
     max_score_AI,generation_count=get_ai_generation_status()
+    import sys
+    STDOUT = sys.stdout
+    sys.stdout = open(f'gen/gen_{generation_count-1}.txt', 'w')
+
     print(max_score_AI,generation_count)
     print(f'model_gen/gen_{generation_count - 1}.keras')
+
     model = keras.models.load_model(f'model_gen/gen_{generation_count - 1}.keras')
     for i in range(1):
         import datetime
@@ -37,3 +44,5 @@ if __name__ == "__main__":
         game.run(False,print_flag="print")
         if(i%10 == 0):
             print(i)
+    sys.stdout = STDOUT
+    print("end")

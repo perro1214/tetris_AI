@@ -35,9 +35,9 @@ print("make")
 # In[55]:
 
 max_score_AI,generation_count,second_score = get_ai_generation_status(second = True)
-print(max_score_AI,generation_count)
-print(f'./data_gen/data_{max(0,generation_count - 2)}.csv')
-with open(f'./data_gen/data_{max(0,generation_count - 2)}.csv', 'r') as f:
+print(max_score_AI,generation_count,second_score)
+print(f'./data_gen/data_{max(0,generation_count - 1)}.csv')
+with open(f'./data_gen/data_{max(0,generation_count - 1)}.csv', 'r') as f:
     lis = f.read().split() 
 for i in range(len(lis)):
     lis[i] = list(map(int,(lis[i].split(","))))
@@ -117,4 +117,4 @@ for i in range(5):
 # In[60]:
 
 
-model.save(f"model_gen/gen_{max(0,generation_count-1)}.keras")
+model.save(f"model_gen/gen_{max(0,generation_count - 1)}.keras")
