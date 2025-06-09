@@ -1,0 +1,4 @@
+#gitにdata_genとgenとmodel_genを含めない
+data_gen/
+gen/
+model_gen/
