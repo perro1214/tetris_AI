@@ -168,6 +168,58 @@ class Tetris:
                 self.level += 1
                 self.fall_speed = max(0.1, self.fall_speed - 0.1)
 
+    def evaluate_board(self):
+        """AI用のボード評価関数"""
+        line_bonus = self.calculate_line_bonus()
+        hole_penalty = self.calculate_hole_penalty()
+        bumpiness_penalty = self.calculate_bumpiness_penalty()
+        height_penalty = self.calculate_height_penalty()
+        
+        return line_bonus - hole_penalty - bumpiness_penalty - height_penalty
+
+    def calculate_line_bonus(self):
+        """ライン消去ボーナス"""
+        return self.lines_cleared * 100
+
+    def calculate_hole_penalty(self):
+        """穴のペナルティ"""
+        holes = 0
+        for col in range(BOARD_WIDTH):
+            found_block = False
+            for row in range(BOARD_HEIGHT):
+                if self.board[row][col] != 0:
+                    found_block = True
+                elif found_block and self.board[row][col] == 0:
+                    holes += 1
+        return holes * 50
+
+    def calculate_bumpiness_penalty(self):
+        """凸凹のペナルティ"""
+        heights = []
+        for col in range(BOARD_WIDTH):
+            height = 0
+            for row in range(BOARD_HEIGHT):
+                if self.board[row][col] != 0:
+                    height = BOARD_HEIGHT - row
+                    break
+            heights.append(height)
+        
+        bumpiness = 0
+        for i in range(len(heights) - 1):
+            bumpiness += abs(heights[i] - heights[i + 1])
+        return bumpiness * 10
+
+    def calculate_height_penalty(self):
+        """高さのペナルティ"""
+        max_height = 0
+        for col in range(BOARD_WIDTH):
+            for row in range(BOARD_HEIGHT):
+                if self.board[row][col] != 0:
+                    height = BOARD_HEIGHT - row
+                    max_height = max(max_height, height)
+                    break
+        return max_height * 5
+
     def rotate_piece(self, piece):
         # テトリミノを回転
         new_shape = list(zip(*piece['shape'][::-1]))
@@ -257,7 +309,8 @@ class Tetris:
             for j in range(6):
                 req += [[self.current_piece["color"]]+[0,j,k]+flat]
         ####pprint.pprint(len(z))
-        spl = self.model.predict(req,verbose=0)
+        import numpy as np
+        spl = self.model.predict(np.array(req),verbose=0)
         ans_number = -float("INF")
         ans_index = -1
         #########print(spl)

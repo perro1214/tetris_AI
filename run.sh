@@ -1,4 +1,15 @@
 #!/bin/bash
+
+# 仮想環境のセットアップ
+if [ ! -d "venv" ]; then
+    echo "仮想環境を作成します..."
+    python3.10 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+else
+    source venv/bin/activate
+fi
+
 size1=5000
 size2=100
 mkdir -p gen
@@ -21,14 +32,14 @@ for ((i=start; i<count; i++));
 do
     current_datetime=$(date)
     echo "gen_test: $current_datetime $i/$count"
-    (echo $(expr $size2 / 5)| python3 make_dates.py)&
-    (echo $(expr $size2 / 5)| python3 make_dates.py)& 
-    (echo $(expr $size2 / 5)| python3 make_dates.py)& 
-    (echo $(expr $size2 / 5)| python3 make_dates.py)& 
-    (echo $(expr $size2 / 5)| python3 make_dates.py)&
+    (echo $(expr $size2 / 5)| ./venv/bin/python3 make_dates.py)&
+    (echo $(expr $size2 / 5)| ./venv/bin/python3 make_dates.py)& 
+    (echo $(expr $size2 / 5)| ./venv/bin/python3 make_dates.py)& 
+    (echo $(expr $size2 / 5)| ./venv/bin/python3 make_dates.py)& 
+    (echo $(expr $size2 / 5)| ./venv/bin/python3 make_dates.py)&
     wait
-    python3 make_model.py 2> error.txt
-    python3 tetris-one.py 2> error.txt
+    ./venv/bin/python3 make_model.py 2> error.txt
+    ./venv/bin/python3 tetris-one.py 2> error.txt
 done
 
 current_datetime=$(date)
