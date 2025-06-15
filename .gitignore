@@ -3,3 +3,4 @@ data_gen/
 gen/
 model_gen/
 __pycache__/
+venv/
