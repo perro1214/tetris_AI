@@ -57,6 +57,10 @@ python tetris-one.py
 jupyter notebook make_graph.ipynb
 ```
 
+## 実行結果例
+
+![score_sample](./score.jpeg)
+
 ## ファイル構成
 
 ### メインファイル
