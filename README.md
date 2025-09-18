@@ -59,7 +59,7 @@ jupyter notebook make_graph.ipynb
 
 ## 実行結果例
 
-![score_sample](./score.jpeg)
+![score_sample](./README_pictures/score.jpeg)
 
 ## ファイル構成
 
